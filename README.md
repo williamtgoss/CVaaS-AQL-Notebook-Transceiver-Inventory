@@ -1,4 +1,4 @@
-# Transceiver Inventory — Process Guide
+# CVaaS AQL Notebook for Transceiver Inventory — Process Guide
 
 This guide walks through generating a full transceiver inventory (hostname,
 device ID, interface, transceiver type, and serial number) for every switch
@@ -7,6 +7,7 @@ in a CVaaS tenant, using the AQL notebook plus a local merge script.
 Related files in this folder:
 - `Transceiver-Inventory-AQL-Notebook.txt` — the three AQL queries to paste into the notebook
 - `merge_transceivers.py` — combines the three CSV exports into the final report
+- `Arista CVaaS AQL Notebook — All Transceiver Inventory to CSV.pdf` - PDF Document Guide with screenshot images and additional details
 
 ## 1. Log into CVaaS
 
