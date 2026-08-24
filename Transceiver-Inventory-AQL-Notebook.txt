@@ -1,0 +1,50 @@
+Arista CVaaS AQL Notebook — Transceiver Inventory (3 cells)
+=============================================================
+
+Each cell below is a separate AQL notebook cell. Run each one and export its
+result to CSV (same workflow you've already been using). Then run
+merge_transceivers.py against the three exported files to produce the final
+long-format report.
+
+Validated 2026-08-24 against CVaaS tenant www.cv-prod-us-central1-c.arista.io
+(devices WTW23230296 "Goss-710" and WTW24220003 "ZTX-7250").
+
+
+Cell 1 — Serial number, per device/interface
+---------------------------------------------
+
+let xcvrStatus = `*:/Sysdb/hardware/archer/xcvr/status/all/*`
+let filteredXcvrStat = xcvrStatus | map(_value | mapne(_value, _value | field("vendorInfo") | field("vendorSn")))
+filteredXcvrStat | map(_value | mapne(_value, _value[0]))
+
+Export as: serials.csv
+
+
+Cell 2 — Media/form-factor type, per device/interface
+--------------------------------------------------------
+
+let xcvrStatus = `*:/Sysdb/hardware/archer/xcvr/status/all/*`
+let filteredXcvrType = xcvrStatus | map(_value | mapne(_value, _value | field("mediaType") | field("Name")))
+filteredXcvrType | map(_value | mapne(_value, _value[0]))
+
+Export as: types.csv
+
+
+Cell 3 — Hostname, per device
+--------------------------------
+
+let hostnameRaw = `analytics:/Devices/*/versioned-data/Device`
+let hostnameFiltered = hostnameRaw | mapne(_value, _value | field("hostname"))
+let hostnames = hostnameFiltered | mapne(_value, _value[0])
+hostnames | map(newDict() | setFields("hostname", _value))
+
+Export as: hostnames.csv
+
+
+Then run:
+---------
+python merge_transceivers.py serials.csv types.csv hostnames.csv -o transceiver-report.csv
+
+Output columns: hostname, device_id, interface, type, serial
+Rows with no transceiver installed (empty serial, or the notebook's
+"Unknown"/blank placeholder) are excluded automatically.
